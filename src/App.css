@@ -1,3 +1,7 @@
+*{
+    margin: 0;
+    padding: 0;
+}
 /* WRAPPER */
 .search-wrapper {
     position: relative;
@@ -195,4 +199,13 @@
     100% {
         background-position: 200% 0;
     }
+}
+
+.addStoreBtn{
+    padding: 8px 12px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
 }
