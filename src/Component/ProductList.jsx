@@ -1,17 +1,12 @@
-import ProductCard from "./ProductCard";
-
 export default function ProductList({ products }) {
-  if (!products.length) return <p>No results found 😢</p>;
-  
+  if (!Array.isArray(products)) return null;
 
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(4, 1fr)",
-      gap: "20px"
-    }}>
+    <div>
       {products.map((p) => (
-        <ProductCard key={p.id} product={p} />
+        <div key={p.id}>
+          {p.title} ({p.store})
+        </div>
       ))}
     </div>
   );

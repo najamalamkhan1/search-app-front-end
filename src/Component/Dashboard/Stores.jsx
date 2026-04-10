@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react'
 
 const Stores = () => {
   const [showForm, setShowForm] = useState(false);
-  const [storeUrl, setStoreUrl] = useState("");
-  const [token, setToken] = useState("");
   const [stores, setStores] = useState([]);
   const [editStore, setEditStore] = useState(null);
   const [editUrl, setEditUrl] = useState("");
   const [editToken, setEditToken] = useState("");
   const [error, setError] = useState("")
+  const [domain, setDomain] = useState("");
+  const [accessToken, setAccessToken] = useState("");
+
+
 
   const fetchStores = async () => {
     const res = await fetch("https://tbp-search-app-backend-production.up.railway.app/api/store");
@@ -21,22 +23,17 @@ const Stores = () => {
   }, []);
 
   const handleAddStore = async () => {
-    if (!storeUrl || !token) {
-      alert("Fill all fields");
-      return;
-    }
-
     await fetch("https://tbp-search-app-backend-production.up.railway.app/api/store/add", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ storeUrl, token }),
+      body: JSON.stringify({
+        domain,
+        accessToken,
+      }),
     });
 
-    setStoreUrl("");
-    setToken("");
-    setShowForm(false);
 
     fetchStores(); // refresh list
   };
@@ -72,6 +69,30 @@ const Stores = () => {
     setEditStore(null);
     fetchStores();
   };
+
+  const deleteStore = async (id) => {
+    console.log("DELETE ID:", id); // 👈 debug
+
+    if (!id) {
+      console.error("ID missing!");
+      return;
+    }
+
+    try {
+      await fetch(
+        `https://tbp-search-app-backend-production.up.railway.app/api/store/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      setStores((prev) => prev.filter((s) => s._id !== id));
+
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
+
   return (
     <div className="main">
       <div className="header">
@@ -85,15 +106,17 @@ const Stores = () => {
       {showForm && (
         <div className="form">
           <input
-            placeholder="Store URL"
-            value={storeUrl}
-            onChange={(e) => setStoreUrl(e.target.value)}
+            type="text"
+            placeholder="Store domain"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
           />
 
           <input
-            placeholder="Access Token"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
+            type="text"
+            placeholder="Access token"
+            value={accessToken}
+            onChange={(e) => setAccessToken(e.target.value)}
           />
           <button onClick={handleAddStore}>Save</button>
         </div>
@@ -103,16 +126,19 @@ const Stores = () => {
       <div className="store-grid">
         {stores.map((store) => (
           <div className="store-card" key={store._id}>
-            <h3>{store.storeUrl}</h3>
-            <p>{store.token.slice(0, 8)}...</p>
+            <h3>{store.domain}</h3>
+            <p>{store.accessToken.slice(0, 8)}...</p>
             <button
               onClick={() => {
                 setEditStore(store);
-                setEditUrl(store.storeUrl);
-                setEditToken(store.token);
+                setEditUrl(store.domain);
+                setEditToken(store.accessToken);
               }}
             >
               Edit
+            </button>
+            <button onClick={() => deleteStore(store._id)}>
+              Delete
             </button>
           </div>
 
